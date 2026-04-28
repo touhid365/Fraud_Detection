@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Render.com Deployment Script
+# Completely FREE deployment
+# https://render.com
+
+echo "🚀 Render.com Deployment Helper"
+echo "================================"
+echo ""
+echo "Step 1: Create MongoDB Atlas Database (FREE)"
+echo "  1. Go to https://www.mongodb.com/cloud/atlas"
+echo "  2. Sign up (free)"
+echo "  3. Create a free cluster"
+echo "  4. Get connection string"
+echo ""
+read -p "Paste your MongoDB Atlas connection string: " MONGODB_URI
+
+echo ""
+echo "Step 2: Prepare GitHub Repository"
+echo "  Make sure to push all code to GitHub"
+read -p "Is your code pushed to GitHub? (yes/no): " GITHUB_READY
+
+if [ "$GITHUB_READY" != "yes" ]; then
+    echo "❌ Please push your code to GitHub first:"
+    echo "   git add ."
+    echo "   git commit -m 'Fraud Detection System'"
+    echo "   git push origin main"
+    exit 1
+fi
+
+echo ""
+echo "Step 3: Render.com Setup"
+echo "  1. Go to https://render.com"
+echo "  2. Click 'New +' and select 'Web Service'"
+echo "  3. Connect your GitHub account"
+echo "  4. Select: touhid365/Fraud_Detection"
+echo ""
+echo "BACKEND DEPLOYMENT:"
+echo "  Name: fraud-detection-backend"
+echo "  Runtime: Node"
+echo "  Build Command: cd backend && npm install"
+echo "  Start Command: cd backend && npm start"
+echo "  Port: 5000"
+echo ""
+echo "Environment Variables:"
+echo "  MONGODB_URI=$MONGODB_URI"
+echo "  JWT_SECRET=$(openssl rand -base64 32)"
+echo "  NODE_ENV=production"
+echo ""
+echo "ML MODEL DEPLOYMENT:"
+echo "  Name: fraud-detection-ml"
+echo "  Runtime: Python"
+echo "  Build Command: cd ml-model && pip install -r requirements.txt"
+echo "  Start Command: cd ml-model && python app.py"
+echo "  Port: 5001"
+echo ""
+echo "FRONTEND DEPLOYMENT:"
+echo "  Name: fraud-detection-frontend"
+echo "  Runtime: Static Site"
+echo "  Build Command: cd frontend && npm install && npm run build"
+echo "  Publish Directory: frontend/build"
+echo ""
+echo "Environment Variables:"
+echo "  REACT_APP_API_URL=https://fraud-detection-backend.onrender.com"
+echo ""
+echo ""
+echo "✅ Deployment Instructions:"
+echo "   1. Visit https://render.com"
+echo "   2. Follow the configuration above"
+echo "   3. Click 'Deploy'"
+echo "   4. Wait 5-10 minutes"
+echo "   5. Your app will be live!"
+echo ""
+echo "📚 Support:"
+echo "   - Render Docs: https://render.com/docs"
+echo "   - MongoDB Atlas: https://docs.atlas.mongodb.com"
+echo ""
+echo "🎉 Total Cost: $0/month"
