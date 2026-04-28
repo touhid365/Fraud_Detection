@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:5.0
+    container_name: fraud_detection_mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - fraud_detection_network
+
+  backend:
+    image: ${DOCKER_USERNAME}/fraud-detection-backend:latest
+    container_name: fraud_detection_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: mongodb://admin:${MONGO_PASSWORD:-password}@mongodb:27017/fraud-detection
+      JWT_SECRET: ${JWT_SECRET}
+      ML_MODEL_URL: http://ml-model:5001
+      NODE_ENV: production
+      PORT: 5000
+    depends_on:
+      - mongodb
+    networks:
+      - fraud_detection_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  ml-model:
+    image: ${DOCKER_USERNAME}/fraud-detection-ml:latest
+    container_name: fraud_detection_ml_model
+    restart: always
+    ports:
+      - "5001:5001"
+    environment:
+      FLASK_ENV: production
+    networks:
+      - fraud_detection_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    image: ${DOCKER_USERNAME}/fraud-detection-frontend:latest
+    container_name: fraud_detection_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: ${FRONTEND_API_URL:-http://localhost:5000}
+    depends_on:
+      - backend
+    networks:
+      - fraud_detection_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: fraud_detection_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - fraud_detection_network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  fraud_detection_network:
+    driver: bridge
