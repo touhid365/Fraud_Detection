@@ -1,0 +1,13 @@
+# This file tells Replit how to run your app
+
+run = "cd backend && npm start"
+
+language = "nodejs"
+ontop = "npm test || true"
+
+[nix]
+channels = ["nixpkgs-unstable"]
+
+[[ports]]
+address = "5000"
+serve = "static"
