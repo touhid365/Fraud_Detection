@@ -1,0 +1,43 @@
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  border-left: 4px solid #3b82f6;
+}
+
+.stat-danger {
+  border-left-color: #ef4444;
+}
+
+.stat-warning {
+  border-left-color: #f59e0b;
+}
+
+.stat-success {
+  border-left-color: #10b981;
+}
+
+.stat-icon {
+  font-size: 2rem;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-title {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.stat-value {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 5px 0 0 0;
+}

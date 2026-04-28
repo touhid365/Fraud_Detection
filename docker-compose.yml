@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:5.0
+    container_name: fraud_detection_mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+    container_name: fraud_detection_backend
+    ports:
+      - "5000:5000"
+    environment:
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/fraud-detection
+      JWT_SECRET: your_jwt_secret_key
+      ML_MODEL_URL: http://ml-model:5001
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app
+
+  ml-model:
+    build:
+      context: ./ml-model
+    container_name: fraud_detection_ml_model
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./ml-model:/app
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: fraud_detection_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5000
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+volumes:
+  mongodb_data:
